@@ -1,11 +1,11 @@
 <template>
-  <div class="home">this is homepage<TabbarView></TabbarView></div>
+  <div class="list">this is list<TabbarView></TabbarView></div>
 </template>
 
 <script>
 import TabbarView from "../components/common/Tabbar.vue";
 export default {
-  name: "HomeView",
+  name: "ListView",
   components: {
     TabbarView,
   },

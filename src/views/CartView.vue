@@ -1,11 +1,11 @@
 <template>
-  <div class="home">this is homepage<TabbarView></TabbarView></div>
+  <div class="cart">this is cart<TabbarView></TabbarView></div>
 </template>
 
 <script>
 import TabbarView from "../components/common/Tabbar.vue";
 export default {
-  name: "HomeView",
+  name: "CartView",
   components: {
     TabbarView,
   },
