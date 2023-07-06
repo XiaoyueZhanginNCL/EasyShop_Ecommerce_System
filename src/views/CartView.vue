@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import TabbarView from "../components/common/Tabbar.vue";
+import TabbarView from "@/components/common/Tabbar.vue";
 export default {
   name: "CartView",
   components: {

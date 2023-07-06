@@ -4,7 +4,7 @@ import router from "./router";
 import store from "./store";
 
 //public css document
-import "./assets/css/common.css";
+import "@/assets/css/common.css";
 
 Vue.config.productionTip = false;
 

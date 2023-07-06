@@ -68,7 +68,7 @@ export default {
   z-index: 999;
   width: 100%;
   height: 1.6rem;
-  background-color: #ffe5ca;
+  background-color: #fff3e2;
 }
 .tabbar ul {
   display: flex;
