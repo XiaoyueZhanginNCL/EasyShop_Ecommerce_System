@@ -1,8 +1,8 @@
 <template>
   <header>
-    <h1>
-      <img src="@/assets/images/logo.png" alt="" />
-    </h1>
+    <!--    <h1>
+      <img src="@/assets/images/fruit.png" alt="" />
+    </h1> -->
     <div class="search">
       <img src="@/assets/images/search.png" alt="" />
       <span>search items...</span>
@@ -24,23 +24,24 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: fixed;
+  /*  position: fixed;
   top: 0;
-  left: 0;
+  left: 0; */
   width: 100%;
   height: 1.5rem;
   background-color: #fff3e2;
 }
-header h1 img {
-  width: 1rem;
-  height: 1rem;
+/* header h1 img {
+  width: 1.1rem;
+  height: 1.1rem;
   padding-left: 0.3rem;
-}
+} */
 .search {
   display: flex;
   align-items: center;
-  width: 6.56rem;
+  width: 8.3rem;
   height: 0.8rem;
+  margin-left: 0.3rem;
   background-color: #ffffff;
   border-radius: 12px;
 }
