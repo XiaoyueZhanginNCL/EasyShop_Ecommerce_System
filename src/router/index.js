@@ -29,6 +29,43 @@ const routes = [
     name: "MyView",
     component: () => import("../views/MyView.vue"),
   },
+  {
+    path: "/search",
+    name: "SearchView",
+    children: [
+      {
+        path: "/",
+        name: "SearchIndex",
+        component: () => import("../views/search/Search-index.vue"),
+      },
+      {
+        path: "list",
+        name: "SearchList",
+        component: () => import("../views/search/Search-list.vue"),
+      },
+    ],
+    component: () => import("../views/SearchView.vue"),
+  },
+  {
+    path: "/details",
+    name: "DetailsView",
+    component: () => import("../views/Details.vue"),
+  },
+  {
+    path: "/login",
+    name: "LoginView",
+    component: () => import("../views/login/LoginView.vue"),
+  },
+  {
+    path: "/userLogin",
+    name: "UserLogin",
+    component: () => import("../views/login/UserLogin.vue"),
+  },
+  {
+    path: "/register",
+    name: "RegisterView",
+    component: () => import("../views/login/Register.vue"),
+  },
 ];
 
 const router = new VueRouter({

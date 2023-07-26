@@ -3,7 +3,7 @@
     <CardView></CardView>
     <ul>
       <li v-for="(item, index) in recommendList" :key="index">
-        <img :src="item.imgUrl" alt="" />
+        <img v-lazy="item.imgUrl" alt="" />
         <div>
           <h3>{{ item.name }}</h3>
           <p>{{ item.content }}</p>
@@ -24,32 +24,35 @@ export default {
   components: {
     CardView,
   },
+  props: {
+    recommendList: Array,
+  },
   data() {
     return {
-      recommendList: [
-        {
-          id: 1,
-          name: "VonHaus Large Sideboard",
-          imgUrl: "./images/recommend1.jpg",
-          content: "Wide Storage Cabinet White",
-          price: "179",
-        },
-        {
-          id: 2,
-          name: "Dog Storage Basket",
-          imgUrl: "./images/recommend2.jpg",
-          content:
-            "Personalised Dog Storage Basket ssssssssssssssssssssssssssssssss",
-          price: "14.5",
-        },
-        {
-          id: 3,
-          name: "VonHaus Large Sideboard",
-          imgUrl: "./images/recommend1.jpg",
-          content: "Wide Storage Cabinet White",
-          price: "170",
-        },
-      ],
+      // recommendList: [
+      //   {
+      //     id: 1,
+      //     name: "VonHaus Large Sideboard",
+      //     imgUrl: "./images/recommend1.jpg",
+      //     content: "Wide Storage Cabinet White",
+      //     price: "179",
+      //   },
+      //   {
+      //     id: 2,
+      //     name: "Dog Storage Basket",
+      //     imgUrl: "./images/recommend2.jpg",
+      //     content:
+      //       "Personalised Dog Storage Basket ssssssssssssssssssssssssssssssss",
+      //     price: "14.5",
+      //   },
+      //   {
+      //     id: 3,
+      //     name: "VonHaus Large Sideboard",
+      //     imgUrl: "./images/recommend1.jpg",
+      //     content: "Wide Storage Cabinet Whitesssssssssssss",
+      //     price: "170",
+      //   },
+      // ],
     };
   },
 };
@@ -66,6 +69,9 @@ export default {
 .recommend li img {
   width: 3rem;
   height: 3rem;
+}
+.recommend li img[lazy="loading"] {
+  background-color: #f7f7f7;
 }
 .recommend ul li > div {
   position: absolute;

@@ -21,24 +21,6 @@ export default {
   },
   data() {
     return {
-      swiperList: [
-        {
-          id: 1,
-          imgUrl: "./images/swiper1.png",
-        },
-        {
-          id: 2,
-          imgUrl: "./images/swiper2.png",
-        },
-        {
-          id: 3,
-          imgUrl: "./images/swiper3.png",
-        },
-        {
-          id: 4,
-          imgUrl: "./images/swiper4.png",
-        },
-      ],
       swiperOption: {
         options: {
           autoplay: 3000,
@@ -46,6 +28,9 @@ export default {
         },
       },
     };
+  },
+  props: {
+    swiperList: Array,
   },
 };
 </script>

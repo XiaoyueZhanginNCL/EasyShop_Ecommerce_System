@@ -3,7 +3,7 @@
     <!--    <h1>
       <img src="@/assets/images/fruit.png" alt="" />
     </h1> -->
-    <div class="search">
+    <div class="search" @click="goSearch">
       <img src="@/assets/images/search.png" alt="" />
       <span>search items...</span>
     </div>
@@ -16,6 +16,11 @@
 <script>
 export default {
   name: "HeaderView",
+  methods: {
+    goSearch() {
+      this.$router.push("/search");
+    },
+  },
 };
 </script>
 

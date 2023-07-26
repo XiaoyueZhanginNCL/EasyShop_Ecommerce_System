@@ -2,8 +2,12 @@
   <div class="like">
     <CardView><span>Guess</span></CardView>
     <ul>
-      <li v-for="(item, index) in likeList" :key="index">
-        <img :src="item.imgUrl" />
+      <li
+        v-for="(item, index) in likeList"
+        :key="index"
+        @click="goDetails(item.id)"
+      >
+        <img v-lazy="item.imgUrl" />
         <h3>{{ item.name }}</h3>
         <div>
           <span>￡</span>
@@ -21,34 +25,47 @@ export default {
   components: {
     CardView,
   },
+  props: {
+    likeList: Array,
+  },
+  methods: {
+    goDetails(id) {
+      this.$router.push({
+        path: "/details",
+        query: {
+          id: id,
+        },
+      });
+    },
+  },
   data() {
     return {
-      likeList: [
-        {
-          id: 1,
-          name: "Personalised Dog Storage Basket",
-          imgUrl: "./images/recommend1.jpg",
-          price: "199",
-        },
-        {
-          id: 2,
-          name: "Personalised Dog Storage Basket",
-          imgUrl: "./images/recommend2.jpg",
-          price: "19",
-        },
-        {
-          id: 3,
-          name: "Personalised Dog Storage Basket",
-          imgUrl: "./images/recommend2.jpg",
-          price: "8999",
-        },
-        {
-          id: 4,
-          name: "Personalised Dog Storage Basket",
-          imgUrl: "./images/recommend2.jpg",
-          price: "109",
-        },
-      ],
+      // likeList: [
+      //   {
+      //     id: 1,
+      //     name: "Personalised Dog Storage Basket",
+      //     imgUrl: "./images/recommend1.jpg",
+      //     price: "199",
+      //   },
+      //   {
+      //     id: 2,
+      //     name: "Personalised Dog Storage Basket",
+      //     imgUrl: "./images/recommend2.jpg",
+      //     price: "19",
+      //   },
+      //   {
+      //     id: 3,
+      //     name: "Personalised Dog Storage Basket",
+      //     imgUrl: "./images/recommend2.jpg",
+      //     price: "8999",
+      //   },
+      //   {
+      //     id: 4,
+      //     name: "Personalised Dog Storage Basket",
+      //     imgUrl: "./images/recommend2.jpg",
+      //     price: "109",
+      //   },
+      // ],
     };
   },
 };
@@ -70,6 +87,9 @@ export default {
   width: 4rem;
   height: 4rem;
 }
+.like ul li img[lazy="loading"] {
+  background-color: #f7f7f7;
+}
 .like ul li h3 {
   font-size: 12px;
   width: 70%;
@@ -79,8 +99,10 @@ export default {
 }
 .like ul li span {
   font-size: 0.4rem;
+  color: #e74646;
 }
 .like ul li b {
   font-size: 0.5rem;
+  color: #e74646;
 }
 </style>

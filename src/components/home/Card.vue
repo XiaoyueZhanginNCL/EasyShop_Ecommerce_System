@@ -21,6 +21,7 @@ export default {
 }
 .title span {
   position: relative;
+  color: #fa9884;
 }
 .title span::after {
   content: "";

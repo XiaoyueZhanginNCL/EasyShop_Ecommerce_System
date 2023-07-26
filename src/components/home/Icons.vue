@@ -10,30 +10,33 @@
 <script>
 export default {
   name: "IconsView",
+  props: {
+    iconsList: Array,
+  },
   data() {
     return {
-      iconsList: [
-        {
-          id: 1,
-          title: "Fashion",
-          imgUrl: "./images/clothes.png",
-        },
-        {
-          id: 2,
-          title: "Digital Devices",
-          imgUrl: "./images/shopping.png",
-        },
-        {
-          id: 3,
-          title: "School Season",
-          imgUrl: "./images/ecommerce.png",
-        },
-        {
-          id: 4,
-          title: "Finance",
-          imgUrl: "./images/delivery.png",
-        },
-      ],
+      // iconsList: [
+      //   {
+      //     id: 1,
+      //     title: "Fashion",
+      //     imgUrl: "./images/clothes.png",
+      //   },
+      //   {
+      //     id: 2,
+      //     title: "Digital Devices",
+      //     imgUrl: "./images/shopping.png",
+      //   },
+      //   {
+      //     id: 3,
+      //     title: "School Season",
+      //     imgUrl: "./images/ecommerce.png",
+      //   },
+      //   {
+      //     id: 4,
+      //     title: "Finance",
+      //     imgUrl: "./images/delivery.png",
+      //   },
+      // ],
     };
   },
 };
