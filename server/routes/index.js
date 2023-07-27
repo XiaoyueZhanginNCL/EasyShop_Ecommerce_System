@@ -32,13 +32,16 @@ router.post('/api/register', function(req, res, next){
 		//手机号不存在	
 		}else{
 			if(params.userPwd==params.conPwd){
-				//输入的两次密码一致
-				res.send({
-					code:200,
-					data:{
-						status:true,
-						msg:'Registration is successful !',
-					}
+				connection.query(user.insertUser(params),function(error,result){
+					if(error) throw error;
+					//输入的两次密码一致
+					res.send({
+						code:200,
+						data:{
+							status:true,
+							msg:'Registration is successful !',
+						}
+					})
 				})
 			}else{
 				//两次输入的密码不一致

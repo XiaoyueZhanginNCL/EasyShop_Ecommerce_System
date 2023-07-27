@@ -7,6 +7,10 @@ const User = {
 	//查询密码
 	queryUserPwd(option){
 		return 'select * from user where (tel='+option.userTel+') and (pwd=\'' + option.userPwd + '\')'
+	},
+	//添加用户
+	insertUser(option){
+		return 'insert into user (tel,pwd) values ('+option.userTel+',\'' + option.userPwd + '\')'
 	}
 }
 exports =module.exports=User;

@@ -33,6 +33,7 @@ import TabbarView from "@/components/common/Tabbar.vue";
 import HeaderView from "./Header.vue";
 import { Toast } from "mint-ui";
 import http from "@/common/api.js";
+import { mapMutations } from "vuex";
 export default {
   name: "UserLogin",
   components: {
@@ -56,6 +57,7 @@ export default {
     };
   },
   methods: {
+    ...mapMutations(["USER_LOGIN"]),
     goLogin() {
       this.$router.push("/login");
     },
@@ -83,7 +85,10 @@ export default {
           Toast(res.msg);
           //登陆失败
           if (!res.status) return;
+
           //登陆成功，跳转页面
+          this.USER_LOGIN(res.data);
+          this.$router.push("/my");
         });
     },
     //验证信息提示

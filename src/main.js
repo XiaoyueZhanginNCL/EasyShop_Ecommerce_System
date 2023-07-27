@@ -11,6 +11,12 @@ import MintUI from "mint-ui";
 import "mint-ui/lib/style.css";
 
 Vue.use(MintUI);
+
+//引入所有vant组件
+import Vant from "vant";
+import "vant/lib/index.css";
+Vue.use(Vant);
+
 new Vue({
   router,
   store,
