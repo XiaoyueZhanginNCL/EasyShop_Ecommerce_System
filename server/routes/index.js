@@ -3,11 +3,110 @@ var router = express.Router();
 var connection=require('../db/sql.js');
 var user =require('../db/userSql.js');
 var QcloudSms = require("qcloudsms_js");
+let jwt = require('jsonwebtoken');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
+
+//修改购物车中商品的数量
+router.post('/api/updateNum',function(req,res,next){
+	console.log(111111);
+	let id=req.body.id;
+	let changedNum=req.body.changedNum;
+	console.log(id,changedNum);
+	connection.query('update goods_cart set goods_num='+changedNum+' where id='+id+'',function(error,results){
+		res.send({
+			data:{
+				code:200,
+				status:true
+			}
+		})
+	})
+})
+
+//删除购物车中的数据
+router.post('/api/deleteCart', function(req, res, next){
+	let id=req.body.id;
+	connection.query('DELETE FROM goods_cart WHERE id = ?', [id],function(error,result){
+		res.send({
+			data:{
+				code:200,
+				status:true,
+				msg:'Delete Successfully',
+			}
+		})
+	})
+})
+
+
+//查询购物车
+router.post('/api/selectCart', function(req, res, next){
+	let token = req.headers.token;
+	//解析token
+	let tokenObj=jwt.decode(token);
+	console.log(token);
+	console.log(tokenObj);
+	//查询用户
+	connection.query('select * from user where tel='+tokenObj.tel+'',function(error,results){
+		 //用户id
+		 let userId=results[0].id;
+		 //查询购物车
+		 connection.query('select * from goods_cart where user_id='+userId+'',function(error,result){
+			 if(result.length==0){
+				 //用户购物车为空
+				 res.send({
+					 data:{
+						 status:false,
+						 data:result
+					 }
+				 })
+				
+			 }else{
+				 //不为空
+				 res.send({
+				 				 code:200,
+				 				 data:{
+				 					 status:true,
+				 					 data:result
+				 				 }
+				 })
+			 }
+		 })
+	})
+})
+
+//加入购物车
+router.post('/api/addCart', function(req, res, next){
+	let goodsId=req.body.goodsId;
+	let token = req.headers.token;
+	//解析token
+	let tokenObj=jwt.decode(token);
+	//查询用户
+	connection.query('select * from user where tel='+tokenObj.tel+'',function(error,results){
+		//用户id
+		let userId=results[0].id;
+		//查询商品
+		connection.query('select * from goods_list where id='+goodsId+'',function(error,result){
+			let goodsName=result[0].name;
+			let goodsPrice=result[0].price;
+			let goodsImgUrl=result[0].imgUrl;
+			//添加商品进入购物车
+			connection.query('insert into goods_cart (user_id,goods_id,goods_name,goods_price,goods_num,goods_imgUrl) values (\''+userId+'\',\'' + goodsId + '\',\''+goodsName+'\',\''+goodsPrice+'\',"1",\''+goodsImgUrl+'\')',function(e,r){
+				res.send({
+					code:200,
+					data:{
+						msg:"success",
+						status:true
+					}
+				})
+			})
+		})
+	})
+	
+	
+})
 
 //用户注册
 router.post('/api/register', function(req, res, next){
@@ -115,7 +214,7 @@ router.post('/api/login', function(req, res, next){
 						code:200,
 						data:{
 							status:true,
-							data:result,
+							data:result[0],
 							msg:'Login Successful!'
 						}
 					})

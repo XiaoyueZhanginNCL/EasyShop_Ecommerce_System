@@ -10,7 +10,16 @@ const User = {
 	},
 	//添加用户
 	insertUser(option){
-		return 'insert into user (tel,pwd) values ('+option.userTel+',\'' + option.userPwd + '\')'
+		//引入token
+		let jwt = require('jsonwebtoken');
+		//用户信息
+		let payload= {tel:option.userTel};
+		//口令
+		let secret = 'xiaoyue';
+		//生成
+		let token=jwt.sign(payload,secret);
+		
+		return 'insert into user (tel,pwd,imgUrl,nickName,token) values ('+option.userTel+',\'' + option.userPwd + '\',"/images/userdefault.webp",'+option.userTel+',\''+token+'\')'
 	}
 }
 exports =module.exports=User;

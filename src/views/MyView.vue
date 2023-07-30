@@ -9,7 +9,7 @@
     </header>
     <section>
       <ul>
-        <li>Address Management</li>
+        <li @click="goPath">Address Management</li>
         <li v-if="loginStatus" @click="logOut">Log out</li>
       </ul>
     </section>
@@ -30,7 +30,7 @@ export default {
       loginStatus: (state) => state.user.loginStatus,
     }),
     userInfo() {
-      return this.$store.state.user.userInfo[0]; // 取出数组中的第一个对象作为userInfo对象
+      return this.$store.state.user.userInfo; // 取出数组中的第一个对象作为userInfo对象
     },
   },
   created() {
@@ -40,6 +40,9 @@ export default {
     ...mapMutations(["logOut"]),
     goLogin() {
       this.$router.push("/userLogin");
+    },
+    goPath() {
+      this.$router.push("/path");
     },
   },
 };

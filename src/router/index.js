@@ -66,6 +66,18 @@ const routes = [
     name: "RegisterView",
     component: () => import("../views/login/Register.vue"),
   },
+  {
+    path: "/path",
+    name: "PathView",
+    children: [
+      {
+        path: "/",
+        name: "PathIndex",
+        component: () => import("../views/path/Path-index.vue"),
+      },
+    ],
+    component: () => import("../views/PathView.vue"),
+  },
 ];
 
 const router = new VueRouter({

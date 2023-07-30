@@ -15,7 +15,7 @@ export default {
       //持久化存储--->本地存储
       localStorage.setItem("UserInfo", JSON.stringify(user));
     },
-    //读取
+    //从本地存储中读取 更新state
     [INIT_USER](state) {
       let userInfo = JSON.parse(localStorage.getItem("UserInfo"));
       if (userInfo) {

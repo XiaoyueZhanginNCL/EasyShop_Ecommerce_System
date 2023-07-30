@@ -70,7 +70,7 @@
         <img src="../assets/images/collect.png" />
         collect
       </div>
-      <div class="add"><span>add</span></div>
+      <div class="add" @click="addCart"><span>add</span></div>
       <div class="pay"><span>pay</span></div>
     </footer>
   </div>
@@ -78,6 +78,7 @@
 
 <script>
 import "swiper/dist/css/swiper.css";
+import { Toast } from "mint-ui";
 import { swiper, swiperSlide } from "vue-awesome-swiper";
 import BetterScroll from "better-scroll";
 import http from "@/common/api.js";
@@ -148,6 +149,26 @@ export default {
       this.goods = res;
       let imgArr = res.imgUrlArr;
       this.swiperArr = imgArr.split(",");
+    },
+    //加入购物车
+    addCart() {
+      let id = this.$route.query.id;
+      http
+        .$axios({
+          url: "api/addCart",
+          method: "POST",
+          data: {
+            goodsId: id,
+          },
+          headers: {
+            token: true,
+          },
+        })
+        .then((res) => {
+          if (res.status) {
+            Toast(res.msg);
+          }
+        });
     },
     goBack() {
       this.$router.back();
