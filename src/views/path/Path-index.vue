@@ -2,19 +2,20 @@
   <div class="path-index container">
     <HeaderView></HeaderView>
     <section>
-      <ul>
-        <li>
+      <ul v-if="list.length != 0">
+        <li v-for="(item, index) in list" :key="index" @click="goList(item)">
           <div>
-            <span>Sharon</span>
-            <span>7111111111</span>
+            <span>{{ item.name }}</span>
+            <span>{{ item.tel }}</span>
           </div>
           <div>
-            <span class="active">[default]</span>
-            <span>Flat 141, Barrack Road, Newcastle, NE1 4SH</span>
+            <span class="active" v-if="item.isDefault == 0">[default]</span>
+            <span>{{ item.address }}</span>
           </div>
         </li>
       </ul>
-      <div class="add-path">Add Address</div>
+      <h1 v-else>Please add address information</h1>
+      <div class="add-path" @click="goList('add')">Add Address</div>
     </section>
     <TabbarView></TabbarView>
   </div>
@@ -23,10 +24,67 @@
 <script>
 import HeaderView from "@/components/path/Header.vue";
 import TabbarView from "@/components/common/Tabbar.vue";
+import http from "@/common/api.js";
+import { mapState, mapMutations } from "vuex";
 export default {
   components: {
     HeaderView,
     TabbarView,
+  },
+  data() {
+    return {
+      pathStatus: false,
+    };
+  },
+  created() {
+    //从订单页面进来的
+    if (this.$route.query.type == "select") {
+      this.pathStatus = true;
+    }
+
+    this.getData();
+  },
+  computed: {
+    ...mapState({
+      list: (state) => state.path.list,
+    }),
+  },
+  methods: {
+    ...mapMutations(["INIT_DATA"]),
+    getData() {
+      http
+        .$axios({
+          url: "/api/address",
+          method: "post",
+          headers: {
+            token: true,
+          },
+        })
+        .then((res) => {
+          this.INIT_DATA(res.data);
+        });
+    },
+    //添加地址或编辑地址
+    goList(option) {
+      //从订单页面进入来选择
+      if (this.pathStatus) {
+        this.$router.push({
+          path: "/order",
+          query: {
+            type: "select",
+            data: JSON.stringify(option),
+          },
+        });
+        return;
+      }
+
+      this.$router.push({
+        name: "PathList",
+        params: {
+          key: option,
+        },
+      });
+    },
   },
 };
 </script>
@@ -51,6 +109,11 @@ section {
         color: #e74646;
       }
     }
+  }
+  h1 {
+    color: #fa9884;
+    padding: 2.5rem 0.5rem;
+    text-align: center;
   }
   .add-path {
     margin-top: 0.8rem;

@@ -10,6 +10,242 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+//修改订单状态
+router.post('/api/submitOrder',function(req,res,next){
+	console.log("555555",req.body.orderId, req.body.shopArr);
+	let token = req.headers.token;
+	//解析token
+	let tokenObj=jwt.decode(token);
+	//订单号
+	let orderId=req.body.orderId;
+	//购物车选中的商品
+	let shopArr=req.body.shopArr
+	
+	//查询用户
+	connection.query('select * from user where tel='+tokenObj.tel+'',function(error,results){
+		//用户id
+		let userId=results[0].id;
+		connection.query('select * from store_order where user_id='+userId+' and order_id='+orderId+'',function(error,result){
+			//订单的数据库id
+			let id=result[0].id;
+			//修改订单状态
+			connection.query('update store_order set order_status=2 where id='+id+'',function(){
+				//删除购物车数据
+				// shopArr.forEach(v=>{
+				// 	connection.query('delete from goods_cart where id='+v.id+'',function(){
+				// 		res.send({
+				// 			data:{
+				// 				status:true,
+				// 			}
+				// 		})
+				// 	})
+				// })
+				res.send({
+					data:{
+						status:true,
+					}
+				})
+			})
+		})
+	})
+})
+
+//生成订单
+router.post('/api/addOrder',function(req,res,next){
+	let token = req.headers.token;
+	//解析token
+	let tokenObj=jwt.decode(token);
+	
+	let goodsArr=req.body.arr;
+	
+	//生成订单号order_id，规则：时间戳+6位随机数
+	function setTimeDateFmt(s){
+		return s<10?'0'+s:s
+	}
+	function randomNumber(){
+		const now=new Date();
+		let month=now.getMonth()+1;
+		let day=now.getDate();
+		let hour=now.getHours();
+		let minutes=now.getMinutes();
+		let seconds=now.getSeconds();
+		// console.log(month,day,hour,minutes,seconds);
+		month=setTimeDateFmt(month);
+		day=setTimeDateFmt(day);
+		hour=setTimeDateFmt(hour);
+		minutes=setTimeDateFmt(minutes);
+		seconds=setTimeDateFmt(seconds);
+		// console.log(month,day,hour,minutes,seconds);
+		let orderCode=now.getFullYear().toString()+month.toString()+day+hour+minutes+seconds+(Math.round( Math.random()*1000000)).toString();
+	    
+		return orderCode;
+	}
+	// console.log(randomNumber());
+	//未支付：1 待支付：2 支付成功：3 支付失败：4|0
+	
+	let goodsName=[];//商品名称
+	let goodsPrice=0;//商品价格
+	let goodsNum=0;//商品数量
+	
+	goodsArr.forEach(v=>{
+		goodsName.push(v.goods_name);
+		goodsPrice += v.goods_price*v.goods_num;
+		goodsNum += parseInt(v.goods_num);
+	})
+	//订单号
+	let orderNum=randomNumber();
+	
+	connection.query('select * from user where tel='+tokenObj.tel+'',function(error,results){
+		//用户id
+		let userId=results[0].id;
+			
+		connection.query('insert into store_order (order_id,goods_name,goods_price,goods_num,order_status,user_id) values (\''+orderNum+'\',\''+goodsName+'\',\''+goodsPrice+'\',\''+goodsNum+'\',1,'+userId+')',function(){
+			connection.query('select * from store_order where user_id ='+userId+' and order_id='+orderNum+'',function(error,result){
+				res.send({
+					data:{
+						data:result,
+						msg:"success",
+						status:true,
+					}
+				})
+			})
+		})
+	})
+})
+
+//订单中获取商品数据
+router.post('/api/orderItem',function(req,res,next){
+	let idArr=req.body.id;
+	let Arr=[];
+    function queryAndAddToArr(id) {
+    connection.query('select * from goods_cart where id='+id+'', function(error, results) {
+        // 将查询结果添加到 Arr 数组中
+        Arr.push(results[0]);
+        // 判断是否已经处理完所有的 id
+        if (Arr.length === idArr.length) {
+          console.log(Arr);
+          res.send({
+            data: {
+               Arr:Arr
+            }
+          });
+        }
+    });
+  }
+  // 循环遍历 idArr，执行查询操作
+  idArr.forEach((id) => {
+    queryAndAddToArr(id);
+  });
+})
+
+//删除地址
+router.post('/api/deleteAdd',function(req,res,next){
+	let id=req.body.id;
+	connection.query('delete from user_address where id='+id+'',function(error,results){
+		res.send({
+			data:{
+				status:true,
+				msg:'Delete Successfully'
+			}
+		})
+	})
+})
+
+//获取地址数据
+router.post('/api/address',function(req,res,next){
+	let token = req.headers.token;
+	//解析token
+	let tokenObj=jwt.decode(token);
+	//查询用户
+	connection.query('select * from user where tel='+tokenObj.tel+'',function(error,results){
+		//用户id
+		let userId=results[0].id;
+		connection.query('select * from user_address where user_id=?',[userId],function(error,result){
+			res.send({
+				data:{
+					code:200,
+					status:true,
+					data:result
+				}
+			})
+		})
+	})
+})
+
+//添加或编辑地址
+router.post('/api/addAddress',function(req,res,next){
+	let[name,tel,address,isDefault] = [req.body.name,req.body.tel,req.body.address,req.body.isDefault];
+	let status=req.body.status;
+	let id=req.body.id;
+	let token = req.headers.token;
+	//解析token
+	let tokenObj=jwt.decode(token);
+	
+		//查询用户
+		connection.query('select * from user where tel='+tokenObj.tel+'',function(error,results){
+			//用户id
+			let userId=results[0].id;
+			//执行添加操作
+			if(status){
+				if(isDefault==1){
+					connection.query('insert into user_address (name,tel,address,isDefault,user_id) values (\''+name+'\',\''+tel+'\',\''+address+'\','+isDefault+',\''+userId+'\')',function(error,result){
+						res.send({
+							data:{
+								status:true,
+								msg:'Add Successfully'
+							}
+						})
+					})
+				}else{
+					connection.query('select * from user_address where user_id='+userId+' and isDefault= 0 ',function(error,result){
+						let addressId=result[0].id;
+						connection.query('update user_address set isDefault = 1 where id='+addressId+'',function(){
+							connection.query('insert into user_address (name,tel,address,isDefault,user_id) values (\''+name+'\',\''+tel+'\',\''+address+'\','+isDefault+',\''+userId+'\')',function(e,r){
+								res.send({
+									data:{
+										status:true,
+										msg:'Add Successfully'
+									}
+								})
+							})
+						})
+					})
+				}
+			}else{//执行编辑操作
+				if(isDefault==1){
+					//编辑为非默认
+						connection.query('update user_address set name=\''+name+'\',tel=\''+tel+'\',address=\''+address+'\',isDefault = 1 where id='+id+'',function(e,r){
+							res.send({
+								data:{
+									status:true,
+									msg:'Edit Successfully'
+								}
+							})
+						})
+					}else{
+						//编辑为默认
+						connection.query('select * from user_address where user_id='+userId+' and isDefault= 0 ',function(error,result){
+							let addressId=result[0].id;//找到其他为默认值的id号
+							//更新其他记录的默认值
+							connection.query('update user_address set isDefault = 1 where id='+addressId+'',function(){
+								connection.query('update user_address set name=\''+name+'\',tel=\''+tel+'\',address=\''+address+'\',isDefault = 0 where id='+id+'',function(e,r){
+									res.send({
+										data:{
+											status:true,
+											msg:'Edit Successfully'
+										}
+									})
+								})
+							})
+						})
+					}
+					
+				}
+			})
+		
+			
+		})
+
 //修改购物车中商品的数量
 router.post('/api/updateNum',function(req,res,next){
 	console.log(111111);

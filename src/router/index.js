@@ -75,8 +75,18 @@ const routes = [
         name: "PathIndex",
         component: () => import("../views/path/Path-index.vue"),
       },
+      {
+        path: "pathlist",
+        name: "PathList",
+        component: () => import("../views/path/Path-list.vue"),
+      },
     ],
     component: () => import("../views/PathView.vue"),
+  },
+  {
+    path: "/order",
+    name: "OrderView",
+    component: () => import("../views/OrderView.vue"),
   },
 ];
 

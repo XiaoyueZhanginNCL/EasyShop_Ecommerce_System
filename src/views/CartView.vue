@@ -1,14 +1,7 @@
 <template>
   <div class="cart container">
     <header>
-      <!--      <img src="../assets/images/left.png" v-show="false" /> -->
       <span class="title">shopping cart</span>
-      <!--      <span
-        class="edit"
-        @click="isNavBar"
-        v-text="isNavStatus ? 'done' : 'edit'"
-        >edit</span
-      > -->
     </header>
     <section>
       <div class="cart-title" v-if="cartNum">
@@ -53,7 +46,6 @@
       <div class="radio">
         <van-checkbox v-model="isCheckedAll"></van-checkbox>
       </div>
-      <!--      <div class="total" v-show="!isNavStatus"> -->
       <div class="total">
         <div>
           total <span class="total-active">{{ total.num }}</span> products
@@ -63,9 +55,7 @@
           <span class="total-active">￡{{ total.price }}</span>
         </div>
       </div>
-      <!--      <div class="order" v-if="!isNavStatus">go to pay</div> -->
-      <div class="order">go to pay</div>
-      <!--      <div class="order" v-else @click="delGoodsFn">delete</div> -->
+      <div class="order" @click="goOrder">go to pay</div>
     </footer>
     <TabbarView></TabbarView>
   </div>
@@ -73,7 +63,7 @@
 
 <script>
 import http from "@/common/api.js";
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import TabbarView from "@/components/common/Tabbar.vue";
 import { Toast } from "mint-ui";
 import { MessageBox } from "mint-ui";
@@ -84,18 +74,20 @@ export default {
   },
   data() {
     return {
-      // value: 1,
       goodsList: [], //返回的购物车里的数据
       selectList: [], //记录选中的购物车数据的id
       cartNum: true,
-      // isNavStatus: false,
     };
   },
   computed: {
     ...mapState({
       loginStatus: (state) => state.user.loginStatus,
+      // totalVuex: (state) => state.cart.totalVuex,
+      // selectVuex: (state) => state.cart.selectVuex,
+      // totalNum: (state) => state.cart.totalNum,
+      // totalPrice: (state) => state.cart.totalPrice,
+      // selectedItems: (state) => state.cart.selectedItems,
     }),
-    //计算购物车中的total
     total() {
       let total = {
         num: 0,
@@ -107,17 +99,62 @@ export default {
           total.price += parseInt(v.goods_num) * parseInt(v.goods_price);
         }
       });
+
+      // this.$store.commit("SET_TOTAL_NUM", total.num);
+      // this.$store.commit("SET_TOTAL_PRICE", total.price);
+      // this.$store.commit("SET_SELECTED_ITEMS", this.selectList);
+
+      this.CART_CHOICE(total);
+      this.CART_SELECT(this.selectList);
       return total;
     },
     //判断是否全选,返回一个布尔值
     isCheckedAll() {
-      return this.goodsList.length == this.selectList.length;
+      return this.goodsList.length === this.selectList.length;
     },
   },
   created() {
     this.getData();
   },
   methods: {
+    ...mapMutations(["CART_CHOICE", "CART_SELECT", "INIT_ORDER"]),
+    //
+    initOrder() {},
+    //点击结算
+    goOrder() {
+      //没有选中数据
+      if (!this.selectList.length) {
+        Toast("Please select product");
+        return;
+      }
+
+      let newList = [];
+      this.goodsList.forEach((item) => {
+        this.selectList.filter((v) => {
+          if (v == item.id) {
+            newList.push(item);
+          }
+        });
+      });
+
+      //生成订单
+      http
+        .$axios({
+          url: "/api/addOrder",
+          method: "post",
+          headers: {
+            token: true,
+          },
+          data: {
+            arr: newList,
+          },
+        })
+        .then((res) => {
+          if (!res.status) return;
+          this.INIT_ORDER(res.data);
+          this.$router.push("/order");
+        });
+    },
     //修改商品数量
     changeNum(value, item) {
       //当前购物车商品的id以及修改后的数量--->后端
@@ -168,13 +205,8 @@ export default {
               console.log(res);
             });
         }
-        console.log(res);
       });
     },
-    //点击编辑或完成
-    // isNavBar() {
-    //   this.isNavStatus = !this.isNavStatus;
-    // },
     //单选
     checkItem(index) {
       let id = this.goodsList[index].id;
@@ -208,6 +240,7 @@ export default {
         this.unCheckAll();
       }
     },
+
     async getData() {
       //未登录，跳转登陆界面
       if (!this.loginStatus) {
@@ -233,7 +266,6 @@ export default {
       this.goodsList.forEach((v) => {
         this.selectList.push(v.id);
       });
-      console.log(this.goodsList);
     },
   },
 };
@@ -243,7 +275,6 @@ header {
   display: flex;
   align-items: center;
   height: 1.17rem;
-  // color: #fff;
   background-color: #fff3e2;
   .title {
     font-size: 0.6rem;
