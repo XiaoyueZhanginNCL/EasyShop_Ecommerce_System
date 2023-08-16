@@ -39,7 +39,7 @@ export default {
       const that = this;
       MessageBox({
         title: "Notice",
-        message: "Are you sure?",
+        message: "Are you sure to delete?",
         showCancelButton: true,
         confirmButtonText: "Yes",
         cancelButtonText: "No",

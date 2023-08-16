@@ -16,8 +16,8 @@
       <div class="list-l" ref="left">
         <ul class="l-item">
           <li
-            :class="{ active: index == currentIndex }"
             v-for="(item, index) in leftData"
+            :class="{ active: index == currentIndex }"
             :key="index"
             @click="goScroll(index)"
           >

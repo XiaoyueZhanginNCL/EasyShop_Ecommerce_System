@@ -1,13 +1,14 @@
 <template>
   <div class="cart container">
     <header>
-      <span class="title">shopping cart</span>
+      <span class="title">Shopping Cart</span>
     </header>
     <section>
       <div class="cart-title" v-if="cartNum">
-        <van-checkbox v-model="isCheckedAll" @click="isCheckedAllFn">{{
-          isCheckedAll
-        }}</van-checkbox>
+        <van-checkbox
+          v-model="isCheckedAll"
+          @click="isCheckedAllFn"
+        ></van-checkbox>
         <span>products</span>
       </div>
       <div v-if="!cartNum" class="empty">
@@ -55,7 +56,7 @@
           <span class="total-active">￡{{ total.price }}</span>
         </div>
       </div>
-      <div class="order" @click="goOrder">go to pay</div>
+      <div class="order" @click="goOrder"><span>Checkout</span></div>
     </footer>
     <TabbarView></TabbarView>
   </div>
@@ -88,6 +89,7 @@ export default {
       // totalPrice: (state) => state.cart.totalPrice,
       // selectedItems: (state) => state.cart.selectedItems,
     }),
+    //计算总价
     total() {
       let total = {
         num: 0,
@@ -104,8 +106,8 @@ export default {
       // this.$store.commit("SET_TOTAL_PRICE", total.price);
       // this.$store.commit("SET_SELECTED_ITEMS", this.selectList);
 
-      this.CART_CHOICE(total);
-      this.CART_SELECT(this.selectList);
+      this.CART_CHOICE(total); //总价传到vuex
+      this.CART_SELECT(this.selectList); //选中数据传到vuex
       return total;
     },
     //判断是否全选,返回一个布尔值

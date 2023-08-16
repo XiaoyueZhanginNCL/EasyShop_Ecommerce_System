@@ -1,7 +1,7 @@
 <template>
   <div class="order container">
     <header>
-      <img src="@/assets/images/left.png" alt="" />
+      <img @click="goBack" src="@/assets/images/left.png" alt="" />
       <slot>
         <span>Submit Order</span>
       </slot>
@@ -61,6 +61,7 @@
 import http from "@/common/api.js";
 import { Toast } from "mint-ui";
 import { mapMutations, mapGetters, mapState } from "vuex";
+import qs from "qs";
 export default {
   name: "OrderView",
   data() {
@@ -149,8 +150,37 @@ export default {
           },
         })
         .then((res) => {
-          console.log(res);
+          let newArr = [];
+          this.itemList.forEach((v) => {
+            newArr.push(v.goods_name);
+          });
+
+          let dataOrder = {
+            orderId: this.orderId,
+            price: this.totalVuex.price,
+            name: newArr.join(""), //解析成字符串
+          };
+          if (res.status) {
+            http
+              .$axios({
+                url: "/api/payment",
+                method: "post",
+                headers: {
+                  token: true,
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+                data: qs.stringify(dataOrder), //qs用于增加安全性
+              })
+              .then((res) => {
+                if (res.status) {
+                  window.location.href = res.paymentUrl;
+                }
+              });
+          }
         });
+    },
+    goBack() {
+      this.$router.back();
     },
   },
 };

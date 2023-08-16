@@ -4,15 +4,127 @@ var connection=require('../db/sql.js');
 var user =require('../db/userSql.js');
 var QcloudSms = require("qcloudsms_js");
 let jwt = require('jsonwebtoken');
-
+//引入支付宝配置文件
+const alipaySdk=require('../db/alipay.js');
+const AlipayFormData=require('alipay-sdk/lib/form').default;
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+// //查找未支付订单图片
+// router.post('/api/unpaidgoods', function (req, res, next){
+//   let goodsName = req.body.goodsName;
+//   console.log("111", goodsName);
+//   let Arr = [];
+
+//   goodsName.forEach((v, index) => {
+//     console.log("0000", v);
+//     connection.query('select * from goods_list where name=\'' + v + '\'', function (error, result) {
+//       console.log("result", result[index].imgUrl);
+//       Arr.push(result[index].imgUrl);
+
+//       // 如果已经遍历完数组，则进行导航操作
+//       if (index === goodsName.length - 1) {
+// 		  console.log(Arr);
+//         res.send({
+//           data: {
+//             arr:Arr,
+//           }
+//         });
+//       }
+//     });
+//   });
+// });
+
+//查找所有订单
+router.post('/api/allorders', function (req, res, next){
+	let token = req.headers.token;
+	//解析token
+	let tokenObj=jwt.decode(token);
+	//查询用户
+	connection.query('select * from user where tel='+tokenObj.tel+'',function(error,results){
+		//用户id
+		let userId=results[0].id;
+		connection.query('select * from store_order where user_id='+userId+'',function(error,result){
+				res.send({
+					data:{
+						data:result,
+						status:true,
+					}
+				})
+			})
+		})
+})
+
+//查找待发货的订单
+router.post('/api/pending', function (req, res, next){
+	let token = req.headers.token;
+	//解析token
+	let tokenObj=jwt.decode(token);
+	//查询用户
+	connection.query('select * from user where tel='+tokenObj.tel+'',function(error,results){
+		//用户id
+		let userId=results[0].id;
+		connection.query('select * from store_order where user_id='+userId+' and order_status=3',function(error,result){
+			res.send({
+				data:{
+					data:result,
+					status:true,
+				}
+			})
+		})
+	})
+})
+
+// 发起支付
+router.post('/api/payment', async function (req, res, next) {
+  // 订单号
+  let orderId = req.body.orderId;
+  // 商品总价
+  let price = req.body.price;
+  // 购买商品的名称
+  let name = req.body.name;
+  
+  // 开始对接支付宝api
+  const formData = new AlipayFormData();
+  formData.setMethod('get');
+  formData.addField('bizContent', {
+    outTradeNo: orderId,
+    productCode: 'FAST_INSTANT_TRADE_PAY',
+    totalAmount: price,
+    subject: name,
+  });
+  formData.addField('returnUrl', 'http://localhost:8080/my');
+  
+  try {
+    // 返回promise
+    const resp = await alipaySdk.exec('alipay.trade.page.pay', {}, { formData: formData });
+	connection.query('update store_order set order_status=3 where order_id='+orderId+'',function(){
+		res.send({
+		  data: {
+		    code: 200,
+		    status: true,
+		    msg: "Paying",
+		    paymentUrl: resp,
+		  }
+		});
+	})
+  } catch (error) {
+    console.error('Alipay API Error:', error);
+    res.status(500).send({
+      data: {
+        code: 500,
+        status: false,
+        msg: "Payment failed",
+      }
+    });
+  }
+});
+
+
 //修改订单状态
 router.post('/api/submitOrder',function(req,res,next){
-	console.log("555555",req.body.orderId, req.body.shopArr);
 	let token = req.headers.token;
 	//解析token
 	let tokenObj=jwt.decode(token);
@@ -80,8 +192,12 @@ router.post('/api/addOrder',function(req,res,next){
 	    
 		return orderCode;
 	}
-	// console.log(randomNumber());
-	//未支付：1 待支付：2 支付成功：3 支付失败：4|0
+	//未支付：1 
+	//待支付：2 
+	//支付成功（待发货）Pending Shipment：3 
+	//已发货Shipped：4 
+	//已完成Delivered：5
+	//取消订单Cancelled：6
 	
 	let goodsName=[];//商品名称
 	let goodsPrice=0;//商品价格
@@ -333,7 +449,7 @@ router.post('/api/addCart', function(req, res, next){
 				res.send({
 					code:200,
 					data:{
-						msg:"success",
+						msg:"Add to cart successfully",
 						status:true
 					}
 				})
@@ -393,43 +509,6 @@ router.post('/api/register', function(req, res, next){
 	
 })
 
-//发送短信验证码
-router.post('/api/code', function(req, res, next){
-	let tel=req.body.phone;
-	
-	// 短信应用SDK AppID
-	var appid = 1400009099;  // SDK AppID是1400开头
-	
-	// 短信应用SDK AppKey
-	var appkey = "9ff91d87c2cd7cd0ea762f141975d1df37481d48700d70ac37470aefc60f9bad";
-	
-	// 需要发送短信的手机号码
-	var phoneNumbers = [tel];
-	
-	// 短信模板ID，需要在短信应用中申请
-	var templateId = 285590;  // NOTE: 这里的模板ID`7839`只是一个示例，真实的模板ID需要在短信控制台中申请
-	
-	// 签名
-	var smsSign = "三人行慕课";  // NOTE: 这里的签名只是示例，请使用真实的已申请的签名, 签名参数使用的是`签名内容`，而不是`签名ID`
-	
-	// 实例化QcloudSms
-	var qcloudsms = QcloudSms(appid, appkey);
-	
-	// 设置请求回调处理, 这里只是演示，用户需要自定义相应处理回调
-	function callback(err, ress, resData) {
-	    if (err) {
-	        console.log("err: ", err);
-	    } else {
-	        console.log("request data: ", ress.req);
-	        console.log("response data: ", resData);
-	    }
-	}
-	
-	var ssender = qcloudsms.SmsSingleSender();
-	var params = [Math.floor(Math.random()*(9999-1000))+1000];
-	ssender.sendWithParam(86, phoneNumbers[0], templateId,
-	  params, smsSign, "", "", callback);  // 签名参数不能为空串
-})
 
 //用户登录
 router.post('/api/login', function(req, res, next){
@@ -552,14 +631,14 @@ router.get('/api/home', function(req, res, next) {
 					   name: "Dog Storage Basket",
 					   imgUrl: "./images/recommend2.jpg",
 					   content:
-					     "Personalised Dog Storage Basket ssssssssssssssssssssssssssssssss",
+					     "Personalised Dog Storage Basket",
 					   price: "14.5",
 					 },
 					 {
 					   id: 3,
 					   name: "VonHaus Large Sideboard",
 					   imgUrl: "./images/recommend1.jpg",
-					   content: "Wide Storage Cabinet Whitesssssssssssss",
+					   content: "Wide Storage Cabinet White",
 					   price: "170",
 					 }
 				 ]
@@ -587,11 +666,17 @@ router.get('/api/home', function(req, res, next) {
 					   imgUrl: "/images/goods3.jpg",
 					   price: "32",
 					 },
+					 // {
+					 //   id: 4,
+					 //   name: "masks",
+					 //   imgUrl: "/images/goods4.jpg",
+					 //   price: "10",
+					 // }
 					 {
-					   id: 4,
-					   name: "masks",
-					   imgUrl: "/images/goods4.jpg",
-					   price: "10",
+						 id:11,
+						 name:"MISS DIOR EAU DE PARFUM 30m",
+						 imgUrl:"/images/goods11.jpg",
+						 price:"68",
 					 }
 				 ]
 			 },
@@ -670,43 +755,33 @@ router.get('/api/goods/list',function(req,res,next){
 			{
 				//一级
 				id:1,
-				name:"Childen",
+				name:"Toys,Childen & Baby",
 				data:[
 					{
 						//二级
 						id:0,
-						name:"Books",
+						name:"Toys,Childen & Baby",
 						list:[
 							//三级
 							{
 								id:0,
-								name:"Fiction",
-								imgUrl:"/images/category/book1.png"
+								name:"Toys & Games",
+								imgUrl:"/images/category/toy1.png"
 							},
 							{
 								id:1,
-								name:"Science-fiction",
-								imgUrl:"/images/category/book2.png"
+								name:"Baby",
+								imgUrl:"/images/category/toy2.png"
 							},
 							{
 								id:2,
-								name:"Thriller",
-								imgUrl:"/images/category/book3.png"
+								name:"Kid's & Baby Fashion",
+								imgUrl:"/images/category/toy3.png"
 							},
 							{
 								id:3,
-								name:"History",
-								imgUrl:"/images/category/book4.png"
-							},
-							{
-								id:4,
-								name:"Biograph",
-								imgUrl:"/images/category/book5.png"
-							},
-							{
-								id:5,
-								name:"Personal Development",
-								imgUrl:"/images/category/book6.png"
+								name:"Baby Wishlist",
+								imgUrl:"/images/category/toy4.png"
 							},
 						]
 					}
@@ -715,7 +790,7 @@ router.get('/api/goods/list',function(req,res,next){
 			{
 				//一级
 				id:2,
-				name:"Beauty",
+				name:"Health & Beauty",
 				data:[
 					{
 						//二级
@@ -760,7 +835,7 @@ router.get('/api/goods/list',function(req,res,next){
 			{
 				//一级
 				id:3,
-				name:"Fashion",
+				name:"Clothes,Shoes,Jewellery",
 				data:[
 					{
 						//二级
@@ -805,7 +880,7 @@ router.get('/api/goods/list',function(req,res,next){
 			{
 				//一级
 				id:4,
-				name:"Outdoors",
+				name:"Sports & Outdoors",
 				data:[
 					{
 						//二级

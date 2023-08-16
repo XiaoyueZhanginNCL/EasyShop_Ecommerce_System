@@ -7,15 +7,15 @@ export default {
   },
   getters: {},
   mutations: {
-    //设置
+    //Storing user login information
     [USER_LOGIN](state, user) {
       state.loginStatus = true;
       state.token = user.token;
       state.userInfo = user;
-      //持久化存储--->本地存储
+      //Convert to persistent storage
       localStorage.setItem("UserInfo", JSON.stringify(user));
     },
-    //从本地存储中读取 更新state
+    //Read from local storage and update the state
     [INIT_USER](state) {
       let userInfo = JSON.parse(localStorage.getItem("UserInfo"));
       if (userInfo) {

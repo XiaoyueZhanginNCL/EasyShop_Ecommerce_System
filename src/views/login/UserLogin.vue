@@ -47,11 +47,11 @@ export default {
       rules: {
         userTel: {
           rule: /^7\d{9}$/,
-          msg: "Tel cannot be empty and must be 11 numbers",
+          msg: "User account cannot be empty and must be 10 numbers",
         },
         userPwd: {
           rule: /^\w{6,12}$/,
-          msg: "Pwd cannot be empty and must be 6-12 numbers",
+          msg: "Password cannot be empty and must be 6-12 numbers",
         },
       },
     };

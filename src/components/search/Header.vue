@@ -24,8 +24,8 @@ export default {
   name: "HeaderView",
   data() {
     return {
-      searchVal: this.$route.query.key || "",
-      searchArr: [],
+      searchVal: this.$route.query.key || "", //当前用户输入内容
+      searchArr: [], //存储历史搜索内容
     };
   },
   methods: {

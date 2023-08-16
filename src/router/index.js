@@ -88,6 +88,21 @@ const routes = [
     name: "OrderView",
     component: () => import("../views/OrderView.vue"),
   },
+  {
+    path: "/payment",
+    name: "PaymentView",
+    component: () => import("../views/PaymentView.vue"),
+  },
+  {
+    path: "/orderstatus",
+    name: "OrderStatus",
+    component: () => import("../views/OrderStatus.vue"),
+  },
+  {
+    path: "/support",
+    name: "SupportView",
+    component: () => import("../views/SupportView.vue"),
+  },
 ];
 
 const router = new VueRouter({

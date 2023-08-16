@@ -8,9 +8,15 @@
       <div v-else class="login" @click="goLogin">log in/sign up</div>
     </header>
     <section>
-      <ul>
-        <li @click="goPath">Address Management</li>
-        <li v-if="loginStatus" @click="logOut">Log out</li>
+      <ul class="order" v-if="loginStatus">
+        <li>
+          <span @click="allOrders">All Orders</span>
+          <span @click="pending">Pending Shipment</span>
+          <span>Shipped</span>
+          <span>Delivered</span>
+        </li>
+        <li @click="goPath" class="address">Address Management</li>
+        <li v-if="loginStatus" @click="logOut" class="logout">Log out</li>
       </ul>
     </section>
     <TabbarView></TabbarView>
@@ -19,6 +25,7 @@
 
 <script>
 import { mapMutations, mapState } from "vuex";
+import http from "@/common/api.js";
 import TabbarView from "@/components/common/Tabbar.vue";
 export default {
   name: "MyView",
@@ -43,6 +50,52 @@ export default {
     },
     goPath() {
       this.$router.push("/path");
+    },
+    //查看已支付订单
+    pending() {
+      http
+        .$axios({
+          url: "/api/pending",
+          method: "post",
+          headers: {
+            token: true,
+          },
+        })
+        .then((res) => {
+          if (res.status) {
+            this.$router.push({
+              path: "/orderstatus",
+              query: {
+                item: res.data,
+                status: 2,
+              },
+            });
+          }
+          console.log(res.data);
+        });
+    },
+    //查看全部订单
+    allOrders() {
+      http
+        .$axios({
+          url: "/api/allorders",
+          method: "post",
+          headers: {
+            token: true,
+          },
+        })
+        .then((res) => {
+          if (res.status) {
+            this.$router.push({
+              path: "/orderstatus",
+              query: {
+                item: res.data,
+                status: 1,
+              },
+            });
+          }
+          console.log(res.data);
+        });
     },
   },
 };
@@ -82,9 +135,41 @@ header {
 section {
   flex: 1;
   overflow: hidden;
+  .order {
+    li {
+      font-size: 0.37rem;
+      display: flex;
+      justify-content: space-between;
+      span {
+        border: solid 0.1px #fa9884;
+        padding: 0.13rem;
+        border-radius: 12px;
+        color: #e74646;
+        background-color: #fff3e2;
+      }
+    }
+  }
   ul li {
     padding: 0.4rem;
     font-size: 0.5rem;
+    .address {
+      font-size: 0.5rem;
+      border: solid 0.1px #fa9884;
+      border-radius: 12px;
+      width: 80%;
+      margin: 0.2rem;
+      color: #e74646;
+      background-color: #fff3e2;
+    }
+    .logout {
+      font-size: 0.5rem;
+      border: solid 0.1px #fa9884;
+      border-radius: 12px;
+      width: 80%;
+      margin: 0.2rem;
+      color: #e74646;
+      background-color: #fff3e2;
+    }
   }
 }
 </style>

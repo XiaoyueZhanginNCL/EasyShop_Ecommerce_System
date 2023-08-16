@@ -23,25 +23,25 @@ export default {
     return {
       routerList: [
         {
-          title: "home",
+          title: "Home",
           path: "/home",
           active: "/images/home.png",
           selected: "/images/selected.png",
         },
         {
-          title: "list",
+          title: "Categories",
           path: "/list",
           active: "/images/list.png",
           selected: "/images/selected.png",
         },
         {
-          title: "cart",
+          title: "Cart",
           path: "/cart",
           active: "/images/cart.png",
           selected: "/images/selected.png",
         },
         {
-          title: "my",
+          title: "Account",
           path: "/my",
           active: "/images/my.png",
           selected: "/images/selected.png",

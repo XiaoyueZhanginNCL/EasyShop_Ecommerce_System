@@ -45,33 +45,37 @@
         </div>
         <div>
           <img
-            style="width: 100%; height: 500px"
-            src="http://localhost:8080/images/goods2.jpg"
+            style="width: 100%; height: 450px"
+            src="http://localhost:8080/images/details.jpg"
           />
           <img
-            style="width: 100%; height: 500px"
-            src="http://localhost:8080/images/goods2.jpg"
+            style="width: 100%; height: 400px"
+            src="http://localhost:8080/images/details4.jpg"
           />
           <img
-            style="width: 100%; height: 500px"
-            src="http://localhost:8080/images/goods2.jpg"
+            style="width: 100%; height: 400px"
+            src="http://localhost:8080/images/details2.jpg"
+          />
+          <img
+            style="width: 100%; height: 800px"
+            src="http://localhost:8080/images/details3.jpg"
           />
         </div>
       </div>
     </section>
 
     <footer>
-      <div class="support-cell">
+      <div class="support-cell" @click="goSupport">
         <img src="../assets/images/support.png" />
-        support
-        <a href="../../public/index.html"></a>
+        <!--        <a @click="openWhatsApp" href="#">support</a> -->
+        Support
       </div>
       <div class="collect-cell">
         <img src="../assets/images/collect.png" />
-        collect
+        Collect
       </div>
-      <div class="add" @click="addCart"><span>add</span></div>
-      <div class="pay"><span>pay</span></div>
+      <div class="add" @click="addCart"><span>Add to Cart</span></div>
+      <div class="pay"><span>Buy Now</span></div>
     </footer>
   </div>
 </template>
@@ -138,6 +142,27 @@ export default {
     });
   },
   methods: {
+    // openWhatsApp() {
+    //   // 定义弹出窗口的宽度和高度
+    //   const width = 600;
+    //   const height = 400;
+
+    //   // 计算窗口的左上角位置，使其居中
+    //   const left = (window.innerWidth - width) / 2;
+    //   const top = (window.innerHeight - height) / 2;
+
+    //   // 定义窗口属性
+    //   const windowFeatures = `width=${width},height=${height},left=${left},top=${top}`;
+
+    //   // 构建 WhatsApp 链接
+    //   const whatsappLink = `https://web.whatsapp.com/`;
+
+    //   // 在新窗口中打开 WhatsApp
+    //   window.open(whatsappLink, "_blank", windowFeatures);
+    // },
+    goSupport() {
+      this.$router.push("/support");
+    },
     async getData() {
       let id = this.$route.query.id;
       let res = await http.$axios({
