@@ -22,6 +22,6 @@ Part5 Order page
 [Part5.webm](https://github.com/XiaoyueZhanginNCL/EasyShop_Ecommerce_System/assets/130643755/dfe5b1be-3002-4dd9-af54-6d3e0eba9332)
 
 Part6 Payment and Edit address functionality
-https://github.com/XiaoyueZhanginNCL/EasyShop_Ecommerce_System/assets/130643755/d0e1f66b-7be7-4b3c-b6d3-1e3050d432de
+[Part5.webm](https://github.com/XiaoyueZhanginNCL/EasyShop_Ecommerce_System/assets/130643755/d0e1f66b-7be7-4b3c-b6d3-1e3050d432de)
 
 
